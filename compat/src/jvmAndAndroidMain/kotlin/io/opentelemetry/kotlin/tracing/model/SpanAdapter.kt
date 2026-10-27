@@ -194,7 +194,11 @@ storeAttribute(key, value)
     private fun truncateAttributeValue(value: Any): Any = when (value) {
         is String -> value.take(attributeValueLengthLimit)
         is List<*> -> value.map { item ->
-            if (item is String) item.take(attributeValueLengthLimit) else item
+            if (item is String) {
+                item.take(attributeValueLengthLimit)
+            } else {
+                item
+            }
         }
         is ByteArray -> value.copyOf(minOf(value.size, attributeValueLengthLimit))
         is AnyValue -> truncateAnyValue(value)
