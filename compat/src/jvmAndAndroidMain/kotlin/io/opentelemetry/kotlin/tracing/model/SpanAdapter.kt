@@ -127,18 +127,8 @@ internal class SpanAdapter(
     }
 
     private fun applyValueLengthLimit(value: Any): Any {
-        val limit = limitOrUnset(spanLimitsConfig.attributeValueLengthLimit) ?: return value
-        return when (value) {
-            is String -> value.take(limit)
-            is List<*> -> value.map {
-                if (it is String) {
-                    it.take(limit)
-                } else {
-                    it
-                }
-            }
-            else -> value
-        }
+        limitOrUnset(spanLimitsConfig.attributeValueLengthLimit) ?: return value
+        return truncateAttributeValue(value)
     }
 
     override fun setBooleanAttribute(key: String, value: Boolean) {
