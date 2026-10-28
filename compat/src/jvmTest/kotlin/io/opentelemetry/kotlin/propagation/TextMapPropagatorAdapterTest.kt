@@ -8,6 +8,7 @@ import io.opentelemetry.kotlin.aliases.OtelJavaTextMapGetter
 import io.opentelemetry.kotlin.aliases.OtelJavaTextMapPropagator
 import io.opentelemetry.kotlin.context.ContextAdapter
 import io.opentelemetry.kotlin.context.FakeContext
+import io.opentelemetry.kotlin.context.toOtelJavaContext
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
@@ -88,23 +89,14 @@ internal class TextMapPropagatorAdapterTest {
     }
 
     @Test
-    fun `extract returns input context unchanged when context is not a ContextAdapter`() {
-        val input = FakeContext()
-        val throwingGetter = object : TextMapGetter<Map<String, String>> {
-            val errMsg = "getter must not be invoked when context is not a ContextAdapter"
-
-            override fun keys(carrier: Map<String, String>): Collection<String> = error(errMsg)
-            override fun get(carrier: Map<String, String>, key: String): String = error(errMsg)
-            override fun getAll(carrier: Map<String, String>, key: String): List<String> = error(errMsg)
-        }
-
+    fun `extract converts a non-Java context before delegating`() {
         val extracted = TextMapPropagatorAdapter(impl).extract(
-            input,
+            FakeContext(),
             mapOf("baggage" to "k=v"),
-            throwingGetter
+            MapGetter,
         )
 
-        assertSame(input, extracted)
+        assertEquals("v", OtelJavaBaggage.fromContext(extracted.toOtelJavaContext()).getEntryValue("k"))
     }
 
     @Test
