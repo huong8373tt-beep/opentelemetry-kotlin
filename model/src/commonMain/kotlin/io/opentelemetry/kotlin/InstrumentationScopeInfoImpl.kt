@@ -48,7 +48,11 @@ data class InstrumentationScopeInfoImpl(
     private fun attributesHashCode(attributes: Map<String, Any>): Int {
         var result = 0
         for ((key, value) in attributes) {
-            val valueHashCode = if (value is ByteArray) value.contentHashCode() else value.hashCode()
+            val valueHashCode = if (value is ByteArray) {
+                value.contentHashCode()
+            } else {
+                value.hashCode()
+            }
             result += key.hashCode() xor valueHashCode
         }
         return result
