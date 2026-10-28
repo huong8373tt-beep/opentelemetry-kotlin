@@ -133,52 +133,52 @@ internal class SpanAdapter(
 
     override fun setBooleanAttribute(key: String, value: Boolean) {
         impl.setAttribute(key, value)
-storeAttribute(key, value)
+        storeAttribute(key, value)
     }
 
     override fun setStringAttribute(key: String, value: String) {
         impl.setAttribute(key, value)
-storeAttribute(key, value)
+        storeAttribute(key, value)
     }
 
     override fun setLongAttribute(key: String, value: Long) {
         impl.setAttribute(key, value)
-storeAttribute(key, value)
+        storeAttribute(key, value)
     }
 
     override fun setDoubleAttribute(key: String, value: Double) {
         impl.setAttribute(key, value)
-storeAttribute(key, value)
+        storeAttribute(key, value)
     }
 
     override fun setBooleanListAttribute(key: String, value: List<Boolean>) {
         impl.setAttribute(OtelJavaAttributeKey.booleanArrayKey(key), value)
-storeAttribute(key, value)
+        storeAttribute(key, value)
     }
 
     override fun setStringListAttribute(key: String, value: List<String>) {
         impl.setAttribute(OtelJavaAttributeKey.stringArrayKey(key), value)
-storeAttribute(key, value)
+        storeAttribute(key, value)
     }
 
     override fun setLongListAttribute(key: String, value: List<Long>) {
         impl.setAttribute(OtelJavaAttributeKey.longArrayKey(key), value)
-storeAttribute(key, value)
+        storeAttribute(key, value)
     }
 
     override fun setDoubleListAttribute(key: String, value: List<Double>) {
         impl.setAttribute(OtelJavaAttributeKey.doubleArrayKey(key), value)
-storeAttribute(key, value)
+        storeAttribute(key, value)
     }
 
     override fun setByteArrayAttribute(key: String, value: ByteArray) {
         impl.setAttribute(OtelJavaAttributeKey.valueKey(key), OtelJavaValue.of(value))
-storeAttribute(key, value)
+        storeAttribute(key, value)
     }
 
     override fun setAnyValueAttribute(key: String, value: AnyValue) {
         impl.setAttribute(OtelJavaAttributeKey.valueKey(key), value.toOtelJavaValue())
-storeAttribute(key, value)
+        storeAttribute(key, value)
     }
 
     private fun truncateAttributeValue(value: Any): Any = when (value) {
