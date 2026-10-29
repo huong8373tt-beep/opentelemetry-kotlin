@@ -28,6 +28,7 @@ import io.opentelemetry.kotlin.ioDispatcher
 import io.opentelemetry.kotlin.tracing.data.FakeSpanData
 import io.opentelemetry.kotlin.tracing.data.SpanData
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -160,7 +161,7 @@ internal class OtlpHttpSpanExporterTest {
         } finally {
             withContext(NonCancellable) {
                 customExporter.shutdown()
-                assertTrue(customClient.isActive)
+                assertTrue(customClient.coroutineContext[Job]?.isActive == true)
                 customClient.close()
                 customServer.close()
             }
@@ -177,11 +178,11 @@ internal class OtlpHttpSpanExporterTest {
                 HttpClientRegistry.peek(requestTimeoutMs = EXPORT_REQUEST_TIMEOUT_MS)
             )
 
-            assertTrue(sharedClient.isActive)
+            assertTrue(sharedClient.coroutineContext[Job]?.isActive == true)
             assertEquals(OperationResultCode.Success, firstExporter.shutdown())
-            assertTrue(sharedClient.isActive)
+            assertTrue(sharedClient.coroutineContext[Job]?.isActive == true)
             assertEquals(OperationResultCode.Success, secondExporter.shutdown())
-            assertFalse(sharedClient.isActive)
+            assertTrue(sharedClient.coroutineContext[Job]?.isCancelled ?: false)
         } finally {
             HttpClientRegistry.clear()
         }
