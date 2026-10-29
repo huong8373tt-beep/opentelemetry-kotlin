@@ -40,6 +40,8 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
@@ -158,9 +160,30 @@ internal class OtlpHttpSpanExporterTest {
         } finally {
             withContext(NonCancellable) {
                 customExporter.shutdown()
+                assertTrue(customClient.isActive)
                 customClient.close()
                 customServer.close()
             }
+        }
+    }
+
+    @Test
+    fun testOwnedHttpClientClosesAfterLastExporterShutdown() = runTest {
+        HttpClientRegistry.clear()
+        try {
+            val firstExporter = fakeConfig().otlpHttpSpanExporter { endpoint = baseUrl }
+            val secondExporter = fakeConfig().otlpHttpSpanExporter { endpoint = baseUrl }
+            val sharedClient = assertNotNull(
+                HttpClientRegistry.peek(requestTimeoutMs = EXPORT_REQUEST_TIMEOUT_MS)
+            )
+
+            assertTrue(sharedClient.isActive)
+            assertEquals(OperationResultCode.Success, firstExporter.shutdown())
+            assertTrue(sharedClient.isActive)
+            assertEquals(OperationResultCode.Success, secondExporter.shutdown())
+            assertFalse(sharedClient.isActive)
+        } finally {
+            HttpClientRegistry.clear()
         }
     }
 
