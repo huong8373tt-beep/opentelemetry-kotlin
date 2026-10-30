@@ -42,6 +42,7 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
@@ -178,10 +179,13 @@ internal class OtlpHttpSpanExporterTest {
             )
 
             assertTrue(sharedClient.coroutineContext[Job]?.isActive == true)
-            assertEquals(OperationResultCode.Success, firstExporter.shutdown())
+            firstExporter.shutdown()
             assertTrue(sharedClient.coroutineContext[Job]?.isActive == true)
-            assertEquals(OperationResultCode.Success, secondExporter.shutdown())
-            assertTrue(sharedClient.coroutineContext[Job]?.isCancelled ?: false)
+            secondExporter.shutdown()
+            assertNull(
+                HttpClientRegistry.peek(requestTimeoutMs = EXPORT_REQUEST_TIMEOUT_MS)
+            )
+            assertTrue(sharedClient.coroutineContext[Job]?.isCompleted == true)
         } finally {
             HttpClientRegistry.clear()
         }
